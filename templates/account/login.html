@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flowbite Login Page with Navbar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Flowbite CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.css" rel="stylesheet" />
+    <style>
+        @layer utilities {
+            .bg-login {
+                background-image: url('https://via.placeholder.com/1920x1080'); /* Replace with your image URL */
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;
+                height: 100vh;
+            }
+        }
+    </style>
+</head>
+<body class="bg-login">
+    <!-- Navbar -->
+    <nav class="bg-white border-gray-200 px-4 py-2.5 shadow-md">
+        <div class="container flex justify-between items-center mx-auto">
+            <!-- Logo -->
+            <a href="#" class="flex items-center">
+                <span class="text-xl font-semibold text-gray-800">MyApp</span>
+            </a>
+            <!-- Profile Dropdown -->
+            <div class="flex items-center space-x-4">
+                <button 
+                    id="profileDropdown" 
+                    data-dropdown-toggle="dropdown" 
+                    class="flex items-center text-sm text-gray-800 rounded-full focus:ring-2 focus:ring-blue-500"
+                >
+                    <img 
+                        class="w-8 h-8 rounded-full" 
+                        src="https://via.placeholder.com/32" 
+                        alt="Profile Picture"
+                    />
+                </button>
+                <!-- Dropdown Menu -->
+                <div 
+                    id="dropdown" 
+                    class="hidden z-10 w-44 bg-white rounded shadow-lg divide-y divide-gray-100"
+                    data-popper-placement="bottom-end"
+                >
+                    <ul class="py-1 text-sm text-gray-700">
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Dashboard</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Settings</a></li>
+                        <li><a href="#" class="block px-4 py-2 hover:bg-gray-100">Log Out</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="flex items-center justify-center h-[calc(100vh-64px)] bg-gray-900 bg-opacity-50">
+        <!-- Card Container -->
+        <div class="w-full max-w-md bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">Login</h2>
+            <form action="#" method="POST" class="space-y-6">
+                {% csrf_token %}
+                <!-- Email Input -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                    <input 
+                        type="email" 
+                        id="email" 
+                        name="email" 
+                        class="flowbite-input block w-full px-3 py-2 text-gray-700 border rounded-md focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Enter your email"
+                        required
+                    />
+                </div>
+                <!-- Password Input -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        name="password" 
+                        class="flowbite-input block w-full px-3 py-2 text-gray-700 border rounded-md focus:border-blue-500 focus:ring-blue-500"
+                        placeholder="Enter your password"
+                        required
+                    />
+                </div>
+                <!-- Remember Me Checkbox -->
+                <div class="flex items-center">
+                    <input 
+                        id="remember" 
+                        type="checkbox" 
+                        class="flowbite-checkbox text-blue-500 border-gray-300 rounded focus:ring-blue-500"
+                    />
+                    <label for="remember" class="ml-2 text-sm text-gray-600">Remember me</label>
+                </div>
+                <!-- Login Button -->
+                <div>
+                    <button 
+                        type="submit" 
+                        class="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        Sign In
+                    </button>
+                </div>
+                <!-- Forgot Password -->
+                <div class="text-center">
+                    <a href="#" class="text-sm text-blue-500 hover:underline">Forgot password?</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Flowbite JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/1.6.5/flowbite.min.js"></script>
+</body>
+</html>
