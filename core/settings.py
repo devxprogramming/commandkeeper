@@ -50,7 +50,6 @@ INSTALLED_APPS = [
 
     # third party apps
     'rest_framework',
-    'django_filters',
     'allauth',
     'allauth.account',
     "django_browser_reload",
