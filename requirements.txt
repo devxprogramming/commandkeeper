@@ -6,3 +6,5 @@ python-dotenv==1.0.1
 gunicorn==23.0.0
 django-allauth==65.1.0
 django-browser-reload==1.16.0
+psycopg==3.2.3
+psycopg-binary==3.2.3
