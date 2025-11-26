@@ -1,0 +1,100 @@
+{% extends 'base_temps/base.html' %}
+{% block title %}CommandKeeper | Dashboard{% endblock %}
+
+{% block content %}
+<section class="card" style="padding: 1.75rem;">
+  <div style="display:flex; align-items:flex-start; justify-content:space-between; gap: 1rem; flex-wrap:wrap;">
+    <div>
+      <p class="muted" style="margin:0; text-transform:uppercase; letter-spacing:0.08em; font-size:0.8rem;">Personal CLI memory palace</p>
+      <h1 style="margin:0.3rem 0 0.2rem;">Your curated command vault</h1>
+      <p class="muted" style="max-width:640px;">Search, filter, and recall your go-to CLI spells without sifting through old terminals. Filter by tag, level, or keyword to get back in flow.</p>
+    </div>
+    <div style="display:flex; gap:0.5rem; align-items:center;">
+      <span class="pill" title="Commands you have saved">{{ commands|length }} saved</span>
+      {% if available_tags %}
+      <span class="pill" title="Distinct tags">{{ available_tags|length }} tags</span>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="card" style="padding: 1.25rem 1.75rem;">
+  <form method="get" class="grid grid-cols-3" style="align-items:end;">
+    <div class="field">
+      <label for="q">Keyword</label>
+      <input type="text" id="q" name="q" value="{{ query }}" placeholder="grep, docker, migration..." aria-label="Search by keyword">
+    </div>
+    <div class="field">
+      <label for="tag">Tag</label>
+      <input list="tags" id="tag" name="tag" value="{{ tag }}" placeholder="networking, git, db..." aria-label="Filter by tag">
+      <datalist id="tags">
+        {% for option in available_tags %}
+        <option value="{{ option }}"></option>
+        {% endfor %}
+      </datalist>
+    </div>
+    <div class="field">
+      <label for="level">Level</label>
+      <select id="level" name="level" aria-label="Filter by importance">
+        <option value="">Any</option>
+        <option value="INFO" {% if level == 'INFO' %}selected{% endif %}>Info</option>
+        <option value="WARNING" {% if level == 'WARNING' %}selected{% endif %}>Warning</option>
+        <option value="ERROR" {% if level == 'ERROR' %}selected{% endif %}>Error</option>
+        <option value="CRITICAL" {% if level == 'CRITICAL' %}selected{% endif %}>Critical</option>
+      </select>
+    </div>
+    <div class="actions" style="grid-column: 1 / -1; justify-content:flex-end; padding-top:0.5rem;">
+      <button type="submit" class="btn btn-primary">Apply filters</button>
+      <a class="btn btn-ghost" href="/commands/">Reset</a>
+    </div>
+  </form>
+</section>
+
+<section class="card" style="padding: 1rem 1.5rem 1.25rem;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+    <h2 style="margin:0;">Commands</h2>
+    <span class="muted" style="font-size:0.9rem;">Sorted by most recently updated</span>
+  </div>
+  {% if commands %}
+  <div style="overflow-x:auto;">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:18%;">Name</th>
+          <th style="width:15%;">Tag</th>
+          <th style="width:12%;">Level</th>
+          <th>Command</th>
+          <th style="width:18%;">Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in commands %}
+        <tr>
+          <td><strong>{{ item.name }}</strong><br><span class="muted">{{ item.description }}</span></td>
+          <td><span class="badge">{{ item.tag }}</span></td>
+          <td>
+            {% if item.level == 'INFO' %}
+              <span class="pill info">Info</span>
+            {% elif item.level == 'WARNING' %}
+              <span class="pill warning">Warning</span>
+            {% elif item.level == 'ERROR' %}
+              <span class="pill error">Error</span>
+            {% else %}
+              <span class="pill critical">Critical</span>
+            {% endif %}
+          </td>
+          <td style="white-space:pre-wrap;">{{ item.command }}</td>
+          <td>
+            <div>{{ item.updated_at|date:'M d, Y H:i' }}</div>
+            <div class="muted">Created {{ item.created_at|date:'M d, Y' }}</div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted" style="margin:0;">No commands found for this filter. Save some favorites and they will appear here.</p>
+  {% endif %}
+</section>
+{% endblock %}

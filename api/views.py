@@ -1,51 +1,58 @@
-from .serializer import CommandSerializer
-from rest_framework import generics
-from commands.models import Command
-from rest_framework.views import APIView
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.viewsets import ViewSet
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404
+from django.db.models import Q
+from rest_framework import status, viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework import filters
+
+from commands.models import Command
+from .serializer import CommandSerializer
 from .throttle import UserBaseRateThrottle
-class CommanAPI(ViewSet):
-    queryset = Command.objects.all()
+
+
+class CommandAPI(viewsets.ModelViewSet):
     serializer_class = CommandSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     throttle_classes = [UserBaseRateThrottle]
-    def list(self, request):
-        queryset = Command.objects.all()
-        serializer = CommandSerializer(queryset, many=True)
-        return Response(serializer.data)
-    
-    def create(self, request):
-        serializer = CommandSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": f"{serializer.data['name']}"}, status=status.HTTP_201_CREATED)
-        return Response( {"message": "Something went wrong"} ,serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def retrieve(self, request, pk):
-        try:
-            queryset = Command.objects.get(pk=pk)
-        except Command.DoesNotExist:
-            return Response({"message": f"Command with ({pk}) not found"}, status=status.HTTP_404_NOT_FOUND)
-        serializer = CommandSerializer(queryset)
-        return Response(serializer.data)
-    
-    def destroy(self, request, pk):
-        queryset = Command.objects.all()
-        command = get_object_or_404(queryset, pk=pk)
-        command.delete()
-        # send success response to show successful deletion
+    filter_backends = [filters.SearchFilter, filters.OrderingFilter]
+    search_fields = ['name', 'description', 'command', 'tag']
+    ordering_fields = ['created_at', 'updated_at', 'name', 'tag']
+    ordering = ['-created_at']
+
+    def get_queryset(self):
+        queryset = Command.objects.filter(user=self.request.user)
+
+        tag = self.request.query_params.get('tag')
+        level = self.request.query_params.get('level')
+        query = self.request.query_params.get('q')
+
+        if query:
+            queryset = queryset.filter(
+                Q(name__icontains=query)
+                | Q(description__icontains=query)
+                | Q(command__icontains=query)
+            )
+
+        if tag:
+            queryset = queryset.filter(tag__icontains=tag)
+
+        if level:
+            queryset = queryset.filter(level=level)
+
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        instance = get_object_or_404(self.get_queryset(), pk=kwargs.get('pk'))
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = get_object_or_404(self.get_queryset(), pk=kwargs.get('pk'))
+        self.perform_destroy(instance)
         return Response({'message': 'Command deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-    
-    def update(self, request, pk):
-        queryset = Command.objects.all()
-        command = get_object_or_404(queryset, pk=pk)
-        serializer = CommandSerializer(command, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response({"message": f"Command updated successfully{serializer.data}"}, status=status.HTTP_200_OK)
-        return Response({"message": "Something went wrong"}, serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    

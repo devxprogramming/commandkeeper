@@ -3,12 +3,13 @@ from django.contrib.auth.models import User
 import uuid
 
 
-levels = (
+LEVELS = (
     ('INFO', 'INFO'),
     ('WARNING', 'WARNING'),
     ('ERROR', 'ERROR'),
     ('CRITICAL', 'CRITICAL'),
 )
+
 
 class Command(models.Model):
     cid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
@@ -17,6 +18,12 @@ class Command(models.Model):
     description = models.TextField()
     command = models.TextField()
     tag = models.CharField(max_length=100)
-    level = models.CharField(max_length=100, choices=levels)
+    level = models.CharField(max_length=100, choices=LEVELS)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.tag})"

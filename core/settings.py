@@ -185,10 +185,10 @@ BROWSER_RELOAD = True
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
-    'DEFAULT_THROTTLE_CLASSES': [   
-        'api.throttle.UserRateThrottle',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'api.throttle.UserBaseRateThrottle',
     ],
-    
+
 }
 
 
